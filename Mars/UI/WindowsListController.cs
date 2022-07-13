@@ -13,31 +13,37 @@ namespace Mars.UI
 {
     internal class WindowsListController
     {
-        public ListBox list { get; private set; }
+        public ListBox List { get; private set; }
         private Dictionary<string, IntPtr> openedWindows = new Dictionary<string, IntPtr>();
         public IntPtr SelectedHwnd { get; private set; }
 
         public WindowsListController(ListBox target)
         {
-            this.list = target;
+            this.List = target;
             Update();
         }
 
         public void Update()
         {
             Dictionary<string, IntPtr> windows = WindowsManager.GetOpenedWindows();
-            list.Items.Clear();
+            List.Items.Clear();
             foreach (var pair in windows)
             {
                 ListBoxItem item = new ListBoxItem();
-                StackPanel sp = new StackPanel();
-                sp.Orientation = Orientation.Horizontal;
-                Image img = new Image();
-                img.Source = WindowsManager.GetWindowIcon(pair.Value);
-                img.Width = 20;
-                img.Height = 20;
-                TextBlock txt = new TextBlock();
-                txt.Text = pair.Key;
+                StackPanel sp = new StackPanel
+                {
+                    Orientation = Orientation.Horizontal
+                };
+                Image img = new Image
+                {
+                    Source = WindowsManager.GetWindowIcon(pair.Value),
+                    Width = 20,
+                    Height = 20
+                };
+                TextBlock txt = new TextBlock
+                {
+                    Text = pair.Key
+                };
                 sp.Children.Add(img);
                 sp.Children.Add(txt);
                 item.Content = sp;
@@ -45,7 +51,7 @@ namespace Mars.UI
                 {
                     SelectedHwnd = pair.Value;
                 };
-                list.Items.Add(item);
+                List.Items.Add(item);
             }
         }
 
