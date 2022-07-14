@@ -99,6 +99,19 @@ namespace Mars.Connection
             }
         }
 
+        public void SendCovenant(byte[] data)
+        {
+            if (!socket.Connected)
+            {
+                MessageBox.Show("Doesn't connected");
+                return;
+            }
+
+            byte[] info = BitConverter.GetBytes(data.Length);
+            socket.Send(info);
+            socket.Send(data);
+        }
+
         public byte[] Receive(int dataSize)
         {
             try
@@ -112,6 +125,22 @@ namespace Mars.Connection
                 MessageBox.Show(ex.ToString());
                 return null;
             }
+        }
+
+        private byte[] buffer = new byte[(int)DataUnit.MB * 4];
+        private byte[] data;
+
+        public byte[] ReceiveCovenant()
+        {
+            byte[] info = new byte[4];
+            socket.Receive(info);
+            int size = BitConverter.ToInt32(info, 0);
+            if (data?.Length != size && size > 0)
+            {
+                data = new byte[size];
+            }
+            socket.Receive(data);
+            return data;
         }
 
         public void Listen()

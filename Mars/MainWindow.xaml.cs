@@ -35,11 +35,12 @@ namespace Mars
         private void Host_Click(object sender, RoutedEventArgs e)
         {
             mars.streamingManager.Host("0.0.0.0", 8080);
+            mars.recordPrewiewController.TogglePreview(Dispatcher, false);
         }
 
         private void Connect_Click(object sender, RoutedEventArgs e)
         {
-            mars.streamingManager.ConnectToHost("127.0.0.1", 8080);
+            mars.streamingManager.ConnectToHost(IpInput.Text, 8080);
         }
     }
 }

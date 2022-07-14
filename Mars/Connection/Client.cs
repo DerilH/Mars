@@ -28,7 +28,7 @@ namespace Mars.Connection
             {
                 while (!connection.Closed)
                 {
-                    byte[] data = connection.Receive((int)DataUnit.MB);
+                    byte[] data = connection.ReceiveCovenant();
                     DataReceived.Invoke(data);
                 }
             });

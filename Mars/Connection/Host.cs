@@ -35,6 +35,7 @@ namespace Mars.Connection
                         while (true)
                         {
                             byte[] data = acceptedConnection.Receive((int)DataUnit.MB);
+                            Thread.Sleep(16);
                         }
                     });
                     receivingThread.Start();
@@ -58,7 +59,7 @@ namespace Mars.Connection
         {
             foreach (Connection connection in connections)
             {
-                connection.Send(data, true);
+                connection.SendCovenant(data);
             }
         }
     }

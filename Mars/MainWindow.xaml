@@ -11,5 +11,6 @@
         <Button x:Name="Host" Content="Хостить" HorizontalAlignment="Left" Margin="16,289,0,0" VerticalAlignment="Top" Width="256" Height="40" Click="Host_Click" />
         <Image x:Name="RecordedPrewiew" Margin="358,57,58,42" />
         <Button x:Name="Connect" Content="Подключиться" HorizontalAlignment="Left" Margin="16,226,0,0" VerticalAlignment="Top" Width="256" Height="40" Click="Connect_Click" />
+        <TextBox x:Name="IpInput" HorizontalAlignment="Left" Margin="16,173,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="256" Height="40" AutomationProperties.HelpText="Я утка" Text="127.0.0.1" MaxLines="1" IsUndoEnabled="False" TextAlignment="Center" />
     </Grid>
 </Window>

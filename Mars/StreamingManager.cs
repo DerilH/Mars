@@ -23,8 +23,7 @@ namespace Mars
 
     internal class StreamingManager
     {
-        private Capture _capture = new Capture(CaptureApi.OutputDuplicate);
-        private Bitmap _currentFrame;
+        private byte[] _currentFrame;
         private RecordPrewiewController recordPrewiewController;
         private Dispatcher dispatcher;
         public Host host { get; private set; }
@@ -41,7 +40,7 @@ namespace Mars
         {
             if (State == StreamingState.Hosting)
             {
-                MessageBox.Show("Alredy hosting");
+                MessageBox.Show("Already hosting");
                 return;
             }
             if (State == StreamingState.Receiving)
@@ -55,16 +54,16 @@ namespace Mars
 
             Thread streamingThread = new Thread(() =>
             {
+                if (!Capture.Capturing) Capture.StartCaptureScreen(60);
+                Capture.OnNewFrame += (frame) =>
+                {
+                    this._currentFrame = frame;
+                    recordPrewiewController.Update(frame);
+                };
                 while (true)
                 {
-                    _currentFrame = _capture.CaptureScreen();
-                    byte[] data;
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        _currentFrame.Save(ms, ImageFormat.Bmp);
-                        data = ms.ToArray();
-                    }
-                    host.SendAll(data);
+                    host.SendAll(_currentFrame);
+                    Thread.Sleep(16);
                 }
             });
             streamingThread.Start();
@@ -86,7 +85,7 @@ namespace Mars
             }
             if (State == StreamingState.Receiving)
             {
-                MessageBox.Show("Alredy receiving");
+                MessageBox.Show("Already receiving");
                 return;
             }
 
@@ -95,11 +94,7 @@ namespace Mars
             recordPrewiewController.TogglePreview(dispatcher);
             client.DataReceived += (data) =>
             {
-                Bitmap bmp;
-                using (var ms = new MemoryStream(data))
-                {
-                    bmp = new Bitmap(ms);
-                }
+                recordPrewiewController.Update(data);
             };
             MessageBox.Show("Connected to host");
         }
