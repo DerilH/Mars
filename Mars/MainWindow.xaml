@@ -4,13 +4,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="MainWindow" Height="720" Width="1280">
-    <Grid>
-        <ListBox x:Name="OpenedWindows__ListBox" IsEnabled="False" d:ItemsSource="{d:SampleData ItemCount=5}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="262" Height="250" Margin="10,415,0,0" />
-        <Button x:Name="ReloadList" Content="Обновить список (Лучше не трогать)" HorizontalAlignment="Left" Margin="16,352,0,0" VerticalAlignment="Top" Width="256" Height="42" Click="ReloadList_Click" />
-        <Button x:Name="Host" Content="Хостить" HorizontalAlignment="Left" Margin="16,289,0,0" VerticalAlignment="Top" Width="256" Height="40" Click="Host_Click" />
-        <Image x:Name="RecordedPrewiew" Margin="358,57,58,42" />
-        <Button x:Name="Connect" Content="Подключиться" HorizontalAlignment="Left" Margin="16,226,0,0" VerticalAlignment="Top" Width="256" Height="40" Click="Connect_Click" />
-        <TextBox x:Name="IpInput" HorizontalAlignment="Left" Margin="16,173,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="256" Height="40" AutomationProperties.HelpText="Я утка" Text="127.0.0.1" MaxLines="1" IsUndoEnabled="False" TextAlignment="Center" />
+        Title="Mars" Height="720" Width="1280">
+    <Grid Height="720" Width="1280">
+        <Image x:Name="CaptureView" Margin="345,25,25,25" />
+        <ScrollViewer x:Name="Info" Background="DimGray" Margin="20,24,960,480">
+            <TextBlock />
+        </ScrollViewer>
+        <TextBox  x:Name="IPInput" Text="127.0.0.1" Background="DimGray" Margin="20,243,960,421" TextAlignment="Center" Padding="0 5 0 0" FontWeight="Bold" FontSize="20"></TextBox>
+        <Button x:Name="Host" Content="Host" Margin="20,574,960,90" FontWeight="Bold" FontSize="20"></Button>
+        <Button x:Name="Connect" Content="Connect" Margin="20,641,960,23" FontWeight="Bold" FontSize="20"></Button>
     </Grid>
 </Window>

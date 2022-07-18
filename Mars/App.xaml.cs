@@ -6,6 +6,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
+using Mars.Core;
+
 namespace Mars
 {
     /// <summary>
@@ -13,5 +15,14 @@ namespace Mars
     /// </summary>
     public partial class App : Application
     {
+        private MarsCore mars;
+
+        public App()
+        {
+        }
+
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {
+        }
     }
 }

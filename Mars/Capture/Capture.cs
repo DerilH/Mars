@@ -1,40 +1,47 @@
 ﻿using System;
-using System.IO;
-using System.Drawing;
-using System.Drawing.Imaging;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading;
-using System.Windows.Forms;
-
 using SharpDX;
 using SharpDX.DXGI;
 using SharpDX.Direct3D11;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Windows.Forms;
 using Point = System.Drawing.Point;
 using Rectangle = System.Drawing.Rectangle;
 
-namespace Mars
+namespace Mars.Capture
 {
-    internal enum CaptureApi
+    public enum CaptureApi
     {
         Gdi,
-        OutputDuplicate
+        OutputDuplication
     }
 
-    internal static class Capture
+    internal class Capture
     {
-        //public static Capture _instance;
+        public static Capture instance { get; private set; }
 
-        private static OutputDuplication outputDuplication;
-        private static SharpDX.Direct3D11.Device device;
-        private static Texture2D screenTexture;
+        private OutputDuplication outputDuplication;
+        private SharpDX.Direct3D11.Device device;
+        private Texture2D screenTexture;
+        public int CaptureWidht { get; private set; }
+        public int CaptureHeight { get; private set; }
+        public CaptureApi Api { get; set; }
 
-        public static CaptureApi Api { get; set; }
-        public static int CaptureWidht { get; private set; }
-        public static int CaptureHeight { get; private set; }
+        private CancellationTokenSource _captureCancelToken;
+        private Bitmap _currentFrame;
+        public bool Capturing { get; private set; }
 
-        static Capture()
+        public delegate void NewFrameEventHandler(Bitmap frame);
+
+        public event NewFrameEventHandler NewFrame = (frame) => { };
+
+        private Capture(CaptureApi api)
         {
-            Api = CaptureApi.OutputDuplicate;
-
+            this.Api = api;
             //Output duplication initializing
             var factory = new Factory1();
             var adapter = factory.GetAdapter1(0);
@@ -65,145 +72,82 @@ namespace Mars
             Thread.Sleep(20); // захватчику экрана надо время проинициализироваться
         }
 
-        public static byte[] CaptureScreen()
+        public static Capture Create(CaptureApi api)
         {
-            if (Api == CaptureApi.Gdi)
-            {
-                //Rectangle bounds = Screen.GetBounds(Point.Empty);
-                //bitmap = new Bitmap(bounds.Width, bounds.Height);
-
-                //using (Graphics g = Graphics.FromImage(bitmap))
-                //{
-                //    g.CopyFromScreen(new Point(bounds.Left, bounds.Top), Point.Empty, bounds.Size);
-                //}
-            }
-            else
-            {
-                Bitmap bitmap = new Bitmap(CaptureWidht, CaptureHeight, PixelFormat.Format32bppArgb);
-                SharpDX.DXGI.Resource screenResource = null;
-                try
-                {
-                    Result res = outputDuplication.TryAcquireNextFrame(10, out OutputDuplicateFrameInformation duplicateFrameInformation, out screenResource);
-                    if (res != Result.Ok) return new byte[0];
-
-                    using (Texture2D screenTexture2D = screenResource.QueryInterface<Texture2D>())
-                    {
-                        device.ImmediateContext.CopyResource(screenTexture2D, screenTexture);
-                    }
-                    DataBox mapSource = device.ImmediateContext.MapSubresource(screenTexture, 0, MapMode.Read, SharpDX.Direct3D11.MapFlags.None);
-                    BitmapData bmpData = bitmap.LockBits(new Rectangle(Point.Empty, bitmap.Size), ImageLockMode.WriteOnly, bitmap.PixelFormat);
-                    IntPtr sourcePtr = mapSource.DataPointer;
-                    IntPtr destPtr = bmpData.Scan0;
-                    Utilities.CopyMemory(destPtr, sourcePtr, mapSource.RowPitch * CaptureHeight);
-                    bitmap.UnlockBits(bmpData);
-                    device.ImmediateContext.UnmapSubresource(screenTexture, 0);
-                    outputDuplication.ReleaseFrame();
-
-                    MemoryStream ms = new MemoryStream();
-                    bitmap.Save(ms, ImageFormat.Bmp);
-                    return ms.ToArray();
-
-                    //unsafe
-                    //{
-                    //    Span<byte> byteArray = new Span<byte>(sourcePtr.ToPointer(), mapSource.RowPitch * CaptureHeight);
-                    //    return byteArray.ToArray();
-                    //}
-                }
-                catch (SharpDXException ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
-                finally
-                {
-                    screenResource?.Dispose();
-                }
-                return new byte[0];
-            }
-            return new byte[0];
+            if (instance != null)
+                return instance;
+            instance = new Capture(api);
+            return instance;
         }
 
-        public static bool Capturing { get; private set; } = false;
-        private static CancellationTokenSource captureToken;
+        public Bitmap CaptureScreen()
+        {
+            if (Api == CaptureApi.Gdi)
+                return CaptureScreenGdi();
+            else
+                return CaptureScreenOutputDuplication();
+        }
 
-        public delegate void NewFrameEventHandler(byte[] frame);
+        private Bitmap CaptureScreenGdi()
+        {
+            Rectangle bounds = Screen.GetBounds(Point.Empty);
+            Bitmap bitmap = new Bitmap(bounds.Width, bounds.Height);
 
-        public static event NewFrameEventHandler OnNewFrame = (frame) => { };
+            using (Graphics g = Graphics.FromImage(bitmap))
+            {
+                g.CopyFromScreen(new Point(bounds.Left, bounds.Top), Point.Empty, bounds.Size);
+            }
+            return bitmap;
+        }
 
-        private static byte[] _currentFrame;
+        private Bitmap CaptureScreenOutputDuplication()
+        {
+            Bitmap bitmap = new Bitmap(CaptureWidht, CaptureHeight, PixelFormat.Format32bppArgb);
+            SharpDX.DXGI.Resource screenResource = null;
+            Result res = outputDuplication.TryAcquireNextFrame(16, out OutputDuplicateFrameInformation duplicateFrameInformation, out screenResource);
+            if (res != Result.Ok) return bitmap;
 
-        public static void StartCaptureScreen(int FramesPerSecond = 60)
+            using (Texture2D screenTexture2D = screenResource.QueryInterface<Texture2D>())
+            {
+                device.ImmediateContext.CopyResource(screenTexture2D, screenTexture);
+            }
+            DataBox mapSource = device.ImmediateContext.MapSubresource(screenTexture, 0, MapMode.Read, SharpDX.Direct3D11.MapFlags.None);
+            BitmapData bmpData = bitmap.LockBits(new Rectangle(Point.Empty, bitmap.Size), ImageLockMode.WriteOnly, bitmap.PixelFormat);
+            IntPtr sourcePtr = mapSource.DataPointer;
+            IntPtr destPtr = bmpData.Scan0;
+            Utilities.CopyMemory(destPtr, sourcePtr, mapSource.RowPitch * CaptureHeight);
+            bitmap.UnlockBits(bmpData);
+            device.ImmediateContext.UnmapSubresource(screenTexture, 0);
+            outputDuplication.ReleaseFrame();
+            return bitmap;
+        }
+
+        public void StartCapture(int FramesPerSecond = 60)
         {
             if (Capturing)
-                throw new Exception("Capturing already started");
+                return;
+            Capturing = true;
 
-            captureToken = new CancellationTokenSource();
             int deltaTime = 1000 / FramesPerSecond;
 
-            Thread capturingThread = new Thread(() =>
+            _captureCancelToken = new CancellationTokenSource();
+            Thread captureThread = new Thread(() =>
             {
-                while (!captureToken.Token.IsCancellationRequested)
+                while (!_captureCancelToken.IsCancellationRequested)
                 {
                     _currentFrame = CaptureScreen();
-
-                    OnNewFrame.Invoke(_currentFrame);
+                    NewFrame.Invoke(_currentFrame);
                     Thread.Sleep(deltaTime);
                 }
-                Capturing = false;
-                _currentFrame = null;
             });
-            capturingThread.Start();
-            Capturing = true;
+            captureThread.Start();
         }
 
-        public static void EndCaptureScreen()
+        public void EndCapture()
         {
-            captureToken?.Cancel();
-        }
-
-        public static Bitmap CaptureCurrentWindow()
-        {
-            Bitmap bitmap;
-            IntPtr windowPtr = WindowsManager.GetForegroundWindow();
-            if (Api == CaptureApi.Gdi)
-            {
-                Rect windowRect = new Rect();
-                WindowsManager.GetWindowRect(windowPtr, ref windowRect);
-                Rectangle bounds = new Rectangle(windowRect.Left, windowRect.Top, windowRect.Right - windowRect.Left, windowRect.Bottom - windowRect.Top);
-                bitmap = new Bitmap(bounds.Width, bounds.Height);
-                using (Graphics g = Graphics.FromImage(bitmap))
-                {
-                    WindowsManager.PrintWindow(windowPtr, g.GetHdc(), 0);
-                }
-            }
-            else
-            {
-                bitmap = new Bitmap(1, 1);
-            }
-            return bitmap;
-        }
-
-        public static Bitmap CaptureWindow(IntPtr hwnd)
-        {
-            Bitmap bitmap;
-            IntPtr windowPtr = hwnd;
-            if (Api == CaptureApi.Gdi)
-            {
-                Rect windowRect = new Rect();
-                WindowsManager.GetWindowRect(windowPtr, ref windowRect);
-                Rectangle bounds = new Rectangle(windowRect.Left, windowRect.Top, windowRect.Right - windowRect.Left, windowRect.Bottom - windowRect.Top);
-                bitmap = new Bitmap(bounds.Width, bounds.Height);
-
-                using (Graphics g = Graphics.FromImage(bitmap))
-                {
-                    WindowsManager.PrintWindow(windowPtr, g.GetHdc(), 0);
-                }
-            }
-            else
-            {
-                bitmap = new Bitmap(1, 1);
-            }
-
-            return bitmap;
+            if (!Capturing)
+                return;
+            _captureCancelToken.Cancel();
         }
     }
 }

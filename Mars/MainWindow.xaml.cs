@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
+using Mars.Core;
 
 namespace Mars
 {
@@ -9,38 +10,12 @@ namespace Mars
     /// </summary>
     public partial class MainWindow : Window
     {
-        private MarsCore mars;
-
         public MainWindow()
         {
             InitializeComponent();
-            mars = new MarsCore(OpenedWindows__ListBox, RecordedPrewiew, Dispatcher);
-            Closing += (e, a) => { System.Environment.Exit(0); };
-        }
 
-        private void WindowShot_Click(object sender, RoutedEventArgs e)
-        {
-            var selected = (KeyValuePair<string, IntPtr>)OpenedWindows__ListBox.SelectedItem;
-        }
-
-        private void ScreenShot_Click(object sender, RoutedEventArgs e)
-        {
-        }
-
-        private void ReloadList_Click(object sender, RoutedEventArgs e)
-        {
-            mars.windowsListController.Update();
-        }
-
-        private void Host_Click(object sender, RoutedEventArgs e)
-        {
-            mars.streamingManager.Host("0.0.0.0", 8080);
-            mars.recordPrewiewController.TogglePreview(Dispatcher, false);
-        }
-
-        private void Connect_Click(object sender, RoutedEventArgs e)
-        {
-            mars.streamingManager.ConnectToHost(IpInput.Text, 8080);
+            MarsCore mars = MarsCore.Create(this);
+            mars.Run();
         }
     }
 }
