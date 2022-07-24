@@ -92,8 +92,8 @@ namespace Mars.Connection
                 Bitmap frame;
                 while (!_receivingCancelToken.IsCancellationRequested)
                 {
-                    if (!stream.DataAvailable)
-                        continue;
+                    //if (!stream.DataAvailable)
+                    //    continue;
                     try
                     {
                         stream.Read(info, 0, 4);

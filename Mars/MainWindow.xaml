@@ -8,7 +8,7 @@
     <Grid Height="720" Width="1280">
         <Image x:Name="CaptureView" Margin="345,25,25,25" />
         <ScrollViewer x:Name="Info" Background="DimGray" Margin="20,24,960,480">
-            <TextBlock />
+            <TextBlock Padding="10 10 0 0"/>
         </ScrollViewer>
         <TextBox  x:Name="IPInput" Text="127.0.0.1" Background="DimGray" Margin="20,243,960,421" TextAlignment="Center" Padding="0 5 0 0" FontWeight="Bold" FontSize="20"></TextBox>
         <Button x:Name="Host" Content="Host" Margin="20,574,960,90" FontWeight="Bold" FontSize="20"></Button>

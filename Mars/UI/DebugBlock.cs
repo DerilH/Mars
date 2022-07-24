@@ -8,12 +8,12 @@ using System.Windows.Controls;
 
 namespace Mars.UI
 {
-    internal class Info : UIElement
+    internal class DebugBlock : UIElement
     {
         private TextBlock _textBlock;
         private ScrollViewer _scrollViewer;
 
-        public Info(ScrollViewer target, Dispatcher dispatcher) : base(dispatcher)
+        public DebugBlock(ScrollViewer target, Dispatcher dispatcher) : base(dispatcher)
         {
             _scrollViewer = target;
             _textBlock = target.Content as TextBlock;

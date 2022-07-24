@@ -13,7 +13,7 @@ namespace Mars.UI
         private MainWindow window { get; }
         public Dispatcher _dispatcher;
         public CaptureView captureView;
-        public Info info;
+        public DebugBlock debugBlock;
         public Input ipInput;
         public Button host, connect;
 
@@ -22,7 +22,7 @@ namespace Mars.UI
             this.window = window;
             _dispatcher = window.Dispatcher;
             captureView = new CaptureView(window.CaptureView, _dispatcher);
-            info = new Info(window.Info, _dispatcher);
+            debugBlock = new DebugBlock(window.Info, _dispatcher);
             ipInput = new Input(window.IPInput, _dispatcher);
             host = new Button(window.Host, _dispatcher);
             connect = new Button(window.Connect, _dispatcher);
