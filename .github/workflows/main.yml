@@ -18,4 +18,4 @@ jobs:
       uses: microsoft/setup-msbuild@v2
 
     - name: Build Solution
-      run: msbuild Mars.csproj /p:Configuration=Release /p:Platform="x64" /restore
+      run: msbuild Mars/Mars.csproj /p:Configuration=Release /p:Platform="x64" /restore
