@@ -141,8 +141,7 @@
     <Compile Include="Capture\Capture.cs" />
     <Compile Include="Connection\ConnectionManager.cs" />
     <Compile Include="Core\MarsCore.cs" />
-    <Compile Include="Debug\Debug.cs" />
-    <Compile Include="Debug\MemoryBarrier.cs" />
+    
     <Compile Include="Extensions\BitmapExtensions.cs" />
     <Compile Include="Streaming\StreamingManager.cs" />
     <Compile Include="UI\Button.cs" />
