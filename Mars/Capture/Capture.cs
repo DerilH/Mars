@@ -68,7 +68,14 @@ namespace Mars.Capture
                 Usage = ResourceUsage.Staging
             };
             screenTexture = new Texture2D(device, textureDesc);
-            outputDuplication = output1.DuplicateOutput(device);
+            try
+            {
+                outputDuplication = output1.DuplicateOutput(device);
+            }
+            catch (SharpDXException ex)
+            {
+                Console.WriteLine($"Warning: Desktop Duplication not supported: {ex.Message}");
+            }
             Thread.Sleep(20); // захватчику экрана надо время проинициализироваться
         }
 
