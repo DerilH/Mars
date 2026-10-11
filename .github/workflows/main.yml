@@ -1,5 +1,4 @@
-YAML
-name: Build Mars (Windows)
+name: Build
 
 on:
   push:
