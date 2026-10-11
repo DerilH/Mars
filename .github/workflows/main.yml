@@ -21,7 +21,7 @@ jobs:
       uses: NuGet/setup-nuget@v1
 
     - name: Restore NuGet packages
-      run: nuget restore ${{ github.workspace }}/Mars/Mars.csproj
+      run: nuget restore ${{ github.workspace }}/Mars/Mars.csproj -PackagesDirectory packages
 
     - name: Build Solution
       run: msbuild ${{ github.workspace }}/Mars/Mars.csproj /p:Configuration=Release /p:Platform="x64"
