@@ -24,7 +24,7 @@ jobs:
       run: nuget restore ${{ github.workspace }}/Mars/Mars.csproj -PackagesDirectory packages
 
     - name: Build Solution
-      run: msbuild ${{ github.workspace }}/Mars/Mars.csproj /p:Configuration=Release /p:Platform="x64"
+      run: msbuild Mars/Mars.csproj /p:Configuration=Release /p:Platform="x64" /p:SolutionDir="${{ github.workspace }}/Mars/"
 
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v4
