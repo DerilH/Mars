@@ -5,8 +5,6 @@ using Mars.Streaming;
 using Mars.Viewing;
 using Mars.Connection;
 
-using Mars.Debugging;
-
 namespace Mars.Core
 {
     internal class MarsCore
@@ -44,8 +42,8 @@ namespace Mars.Core
             UI.host.Click += () => Streaming.StartStream();
             UI.connect.Click += () => Viewing.StartViewing();
 
-            Debug.Init(UI.debugBlock);
-            MemoryBarrier.Enable();
+            // Debug.Init(UI.debugBlock);
+            // MemoryBarrier.Enable();
         }
     }
 }
