@@ -1,4 +1,4 @@
-name: Build
+name: Build Mars (Windows)
 
 on:
   push:
@@ -17,17 +17,5 @@ jobs:
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
 
-    - name: Setup NuGet
-      uses: NuGet/setup-nuget@v1
-
-    - name: Restore NuGet packages
-      run: nuget restore Mars/Mars.csproj -SolutionDirectory .
-
     - name: Build Solution
-      run: msbuild Mars/Mars.csproj /p:Configuration=Release /p:Platform="x64"
-
-    - name: Upload Build Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: Mars-Executable
-        path: Mars/bin/x64/Release/
+      run: msbuild Mars.csproj /p:Configuration=Release /p:Platform="x64" /restore
