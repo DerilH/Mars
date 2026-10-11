@@ -21,13 +21,13 @@ jobs:
       uses: NuGet/setup-nuget@v1
 
     - name: Restore NuGet packages
-      run: nuget restore ${{ github.workspace }}/Mars/Mars.csproj -PackagesDirectory packages
+      run: nuget restore Mars/Mars.csproj -PackagesDirectory ./packages
 
     - name: Build Solution
-      run: msbuild Mars/Mars.csproj /p:Configuration=Release /p:Platform="x64" /p:SolutionDir="${{ github.workspace }}/Mars/"
+      run: msbuild Mars/Mars.csproj /p:Configuration=Release /p:Platform="x64"
 
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: Mars-Executable
-        path: ${{ github.workspace }}/Mars/bin/x64/Release/
+        path: Mars/bin/x64/Release/
