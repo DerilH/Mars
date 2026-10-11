@@ -16,8 +16,6 @@ namespace Mars
 
             MarsCore mars = MarsCore.Create(this);
             mars.Run();
-
-            Debugging.Debug.Log("Strated");
         }
     }
 }
